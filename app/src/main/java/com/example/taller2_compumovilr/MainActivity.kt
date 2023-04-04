@@ -3,7 +3,7 @@ package com.example.taller2_compumovilr
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import com.example.taller2_compumovilr.Activities.CameraActivity
 import com.example.taller2_compumovilr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
