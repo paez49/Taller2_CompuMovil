@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Taller 2 - Mapa y cámara</string>
+    <string name="camaraTextButton">CAMARA</string>
+    <string name="mapTextButton">MAPA</string>
+</resources>
