@@ -25,7 +25,6 @@ public class PermissionService {
 
     static public final int PERMISSIONS_REQUEST_CAMERA = 1001;
     static public final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1002;
-    static public final int PERMISSIONS_REQUEST_READ_CONTACTS = 2002;
 
     private boolean mCameraPermissionGranted;
     private boolean mReadExternalStoragePermissionGranted;
@@ -54,15 +53,6 @@ public class PermissionService {
         } else {
             ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-    }
-
-    public void getContactsPermission(Activity activity){
-        if(checkPermission(Manifest.permission.READ_CONTACTS)){
-            mContactsPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
-            checkPermission(Manifest.permission.READ_CONTACTS);
         }
     }
 

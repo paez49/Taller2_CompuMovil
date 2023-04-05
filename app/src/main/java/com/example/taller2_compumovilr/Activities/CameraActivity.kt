@@ -1,30 +1,27 @@
 package com.example.taller2_compumovilr.Activities
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
+
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 import com.example.taller2_compumovilr.databinding.ActivityCameraBinding
-import com.example.taller2_compumovilr.services.PermissionService
+
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
-import java.text.DateFormat
-import java.util.*
-import javax.inject.Inject
+
+
 
 @AndroidEntryPoint
 class CameraActivity : AppCompatActivity() {
     private val TAG: String =
         CameraActivity::class.java.name
-    private lateinit var binding: ActivityCameraBinding
+    val PERMISSIONS_REQUEST_CAMERA = 1001
 
-    @Inject
-    var permissionService: PermissionService?= null
+    private lateinit var binding: ActivityCameraBinding
 
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_VIDEO_CAPTURE = 2
@@ -34,47 +31,57 @@ class CameraActivity : AppCompatActivity() {
         binding = ActivityCameraBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        Log.i("EL SERVICIO:",permissionService.toString())
+        verifyPermissions()
         binding?.takeButton?.setOnClickListener {
-            if (!permissionService?.isMCameraPermissionGranted!!) {
-                permissionService!!.getCameraPermission(this)
-            } else {
-                takePictureOrVideo()
-            }
+            takePictureOrVideo()
         }
     }
     private fun takePictureOrVideo(){
-        if (binding.videoToggle.isChecked()){
+        if (binding.videoToggle.isChecked){
             takeVideo()
         }else{
             takePhoto()
         }
     }
     private fun takePhoto(){
-        val pictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        //Create temp file for image result
-        val timeStamp = DateFormat.getDateInstance().format(Date())
-        val imageFileName = String.format("%s.jpg", timeStamp)
-        val imageFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), imageFileName)
-        pictureImagePath = FileProvider.getUriForFile(
-            this,
-            "com.example.android.fileprovider",
-            imageFile
-        )
-        pictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureImagePath)
-        try {
-            startActivityForResult(
-                pictureIntent,
-                REQUEST_IMAGE_CAPTURE
-            )
-        } catch (e: ActivityNotFoundException) {
-            Log.e(
-                TAG,
-                e.localizedMessage
-            )
-        }
+
     }
     private fun takeVideo(){
-        
+
+    }
+    private fun verifyPermissions(){
+        Log.d(TAG,"verifyPermission: asking user for permissions")
+        val permissions = arrayOf(
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+
+        if (ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                permissions[0]
+            )== PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                permissions[1]
+            ) == PackageManager.PERMISSION_GRANTED&&
+            ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                permissions[2]
+            ) == PackageManager.PERMISSION_GRANTED){
+            //ACEPTADO
+        }else{
+            ActivityCompat.requestPermissions(this,permissions,1)
+        }
+
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        verifyPermissions()
     }
 }
