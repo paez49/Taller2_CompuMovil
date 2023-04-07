@@ -49,9 +49,8 @@ companion object{
           Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
         ContextCompat.checkSelfPermission(this,
           Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        Toast.makeText(this, "Permisos de almacenamiento aprobados.", Toast.LENGTH_SHORT).show()
         Log.i("Permission storage:","Permisos aceptados")
-
+        takePictureOrVideo()
       } else {
         requestStoragePermission()
       }
@@ -80,7 +79,7 @@ companion object{
     if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA)){
      AlertDialog.Builder(this)
         .setTitle("Permiso denegado")
-        .setMessage("Este permiso es necesario para el funcionamiento de la aplicación")
+        .setMessage("El permiso  de camara es necesario para el funcionamiento de la aplicación")
         .setPositiveButton("Ok", DialogInterface.OnClickListener { dialogInterface, i ->
           ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.CAMERA),
             CAMERA_PERMISSION)
@@ -96,7 +95,7 @@ companion object{
         Manifest.permission.WRITE_EXTERNAL_STORAGE)){
       AlertDialog.Builder(this)
         .setTitle("Permiso denegado")
-        .setMessage("Este permiso es necesario para el funcionamiento de la aplicación")
+        .setMessage("El permiso de almacenamiento es necesario para el funcionamiento de la aplicación")
         .setPositiveButton("Ok", DialogInterface.OnClickListener { dialogInterface, i ->
           ActivityCompat.requestPermissions(this,
             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
