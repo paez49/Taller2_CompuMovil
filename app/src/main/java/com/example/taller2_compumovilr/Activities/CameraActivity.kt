@@ -1,21 +1,32 @@
 package com.example.taller2_compumovilr.Activities
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
+import android.view.View
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.MediaController
+import android.widget.VideoView
+import androidx.annotation.Nullable
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.example.taller2_compumovilr.databinding.ActivityCameraBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import java.text.DateFormat.getDateInstance
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -67,7 +78,24 @@ companion object{
   }
 
   private fun takePhoto() {
-
+    val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+    //Create temp file for image result
+    //Create temp file for image result
+    val timeStamp: String = getDateInstance().format(Date())
+    val imageFileName = String.format("%s.jpg", timeStamp)
+    val imageFile =
+      File(getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() + "/" + imageFileName)
+    pictureImagePath = FileProvider.getUriForFile(
+      this,
+      "com.example.android.file-provider",
+      imageFile
+    )
+    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureImagePath)
+    try {
+      startActivityForResult(takePictureIntent, CAMERA_PERMISSION)
+    } catch (e: ActivityNotFoundException) {
+      Log.e(TAG, e.localizedMessage)
+    }
 
   }
 
@@ -88,6 +116,7 @@ companion object{
         }).create().show()
     }else{
       ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION)
+      takePhoto()
     }
   }
   private fun requestStoragePermission(){
@@ -137,6 +166,15 @@ companion object{
         Log.i("Storage permission","Permiso de almacenamiento no aceptados")
       }
 
+    }
+  }
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if (requestCode == CAMERA_PERMISSION && resultCode == RESULT_OK) {
+      binding.imagePresentation.setImageDrawable(null);
+      binding.imagePresentation.setImageURI(pictureImagePath)
+      binding.imagePresentation.scaleType = ImageView.ScaleType.FIT_CENTER
+      binding.imagePresentation.adjustViewBounds = true
     }
   }
 }
