@@ -12,10 +12,8 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.MediaController
-import android.widget.VideoView
-import androidx.annotation.Nullable
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -47,6 +45,7 @@ companion object{
     binding = ActivityCameraBinding.inflate(layoutInflater)
     val view = binding.root
     setContentView(view)
+    binding.videoPresentation.visibility = View.GONE
     binding?.takeButton?.setOnClickListener {
       if(ContextCompat.checkSelfPermission(this,
           Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
@@ -61,9 +60,9 @@ companion object{
         ContextCompat.checkSelfPermission(this,
           Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         Log.i("Permission storage:","Permisos aceptados")
-        takePictureOrVideo()
+
       } else {
-        requestStoragePermission()
+        //requestStoragePermission()
       }
 
     }
@@ -92,7 +91,7 @@ companion object{
     )
     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureImagePath)
     try {
-      startActivityForResult(takePictureIntent, CAMERA_PERMISSION)
+      startActivityForResult(takePictureIntent, 1)
     } catch (e: ActivityNotFoundException) {
       Log.e(TAG, e.localizedMessage)
     }
@@ -100,7 +99,18 @@ companion object{
   }
 
   private fun takeVideo() {
-
+    val takeVideoIntent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
+    takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 30)
+    takeVideoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
+    if (takeVideoIntent.resolveActivity(this.packageManager) != null) {
+      try {
+        startActivityForResult(takeVideoIntent, 2)
+      } catch (e: ActivityNotFoundException) {
+        Log.e(TAG, e.localizedMessage)
+      }
+    } else {
+      Toast.makeText(this,"ESKERE",Toast.LENGTH_SHORT)
+    }
   }
 
   private fun requestCameraPermission(){
@@ -171,11 +181,28 @@ companion object{
   }
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == CAMERA_PERMISSION && resultCode == RESULT_OK) {
+    if (requestCode == 1 && resultCode == RESULT_OK) {
+      binding.imagePresentation.visibility = View.VISIBLE
+      binding.videoPresentation.visibility = View.GONE
+
       binding.imagePresentation.setImageDrawable(null);
       binding.imagePresentation.setImageURI(pictureImagePath)
       binding.imagePresentation.scaleType = ImageView.ScaleType.FIT_CENTER
       binding.imagePresentation.adjustViewBounds = true
+    }else if (requestCode == 2 && resultCode == RESULT_OK) {
+      binding.imagePresentation.visibility = View.GONE
+      binding.videoPresentation.visibility = View.VISIBLE
+
+      binding.videoPresentation.setVideoURI(null)
+      binding.videoPresentation.setVideoURI(data?.data)
+      binding.videoPresentation.setMediaController(MediaController(this))
+      binding.videoPresentation.start()
+    }
+    if (requestCode == 2 && resultCode == RESULT_CANCELED){
+      binding.videoPresentation.visibility = View.GONE
+    }
+    if (requestCode == 1 && resultCode == RESULT_CANCELED){
+      binding.imagePresentation.visibility = View.GONE
     }
   }
 }

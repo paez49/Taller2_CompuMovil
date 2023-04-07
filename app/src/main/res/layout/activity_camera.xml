@@ -16,40 +16,50 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imagePresentation"
-        android:layout_width="404dp"
-        android:layout_height="528dp"
-        android:layout_marginTop="120dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@color/white" />
+  <ImageView
+    android:id="@+id/imagePresentation"
+    android:layout_width="406dp"
+    android:layout_height="578dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:srcCompat="@color/white" />
 
-    <Button
-        android:id="@+id/takeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:backgroundTint="@color/buttonColor1"
-        android:drawableLeft="@android:drawable/ic_menu_camera"
-        android:text="TAKE"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imagePresentation"
-        app:layout_constraintVertical_bias="0.402" />
+  <Button
+    android:id="@+id/takeButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="28dp"
+    android:layout_marginBottom="48dp"
+    android:backgroundTint="@color/buttonColor1"
+    android:drawableLeft="@android:drawable/ic_menu_camera"
+    android:text="TAKE"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/selectGalleryButton"
-        android:layout_width="253dp"
-        android:layout_height="52dp"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/buttonColor2"
-        android:drawableLeft="@android:drawable/ic_menu_gallery"
-        android:text="PICK FROM GALLERY"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imagePresentation"
-        app:layout_constraintVertical_bias="0.402" />
+  <Button
+    android:id="@+id/selectGalleryButton"
+    android:layout_width="253dp"
+    android:layout_height="52dp"
+    android:layout_marginStart="2dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="48dp"
+    android:backgroundTint="@color/buttonColor2"
+    android:drawableLeft="@android:drawable/ic_menu_gallery"
+    android:text="PICK FROM GALLERY"
+    android:textSize="15sp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toEndOf="@+id/takeButton" />
+
+  <VideoView
+    android:id="@+id/videoPresentation"
+    android:layout_width="413dp"
+    android:layout_height="578dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.487"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
