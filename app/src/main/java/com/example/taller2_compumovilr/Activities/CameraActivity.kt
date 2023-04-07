@@ -116,7 +116,7 @@ companion object{
         }).create().show()
     }else{
       ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION)
-      takePhoto()
+
     }
   }
   private fun requestStoragePermission(){
@@ -146,6 +146,7 @@ companion object{
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     if(requestCode == CAMERA_PERMISSION){
       if(grantResults.isNotEmpty() && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+        takePhoto()
         Log.i("Camera permission","Permiso de cámara aceptado")
       }else{
         val snackbar = Snackbar.make(binding.root, "Permiso de camara no fue otorgado", Snackbar.LENGTH_LONG)
