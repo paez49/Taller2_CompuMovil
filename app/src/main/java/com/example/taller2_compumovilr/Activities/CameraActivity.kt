@@ -39,13 +39,22 @@ companion object{
     binding?.takeButton?.setOnClickListener {
       if(ContextCompat.checkSelfPermission(this,
           Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
-        Toast.makeText(this,"Permisos aprobados.",Toast.LENGTH_SHORT)
+        Log.i("Permission camera:","Permisos aceptados")
       }else{
         requestCameraPermission()
       }
     }
     binding?.selectGalleryButton?.setOnClickListener {
+      if (ContextCompat.checkSelfPermission(this,
+          Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+        ContextCompat.checkSelfPermission(this,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        Toast.makeText(this, "Permisos de almacenamiento aprobados.", Toast.LENGTH_SHORT).show()
+        Log.i("Permission storage:","Permisos aceptados")
 
+      } else {
+        requestStoragePermission()
+      }
 
     }
   }
@@ -66,21 +75,6 @@ companion object{
   private fun takeVideo() {
 
   }
-  private fun checkPermission(permission : String, requestCode : Int){
-    if(ContextCompat.checkSelfPermission(this,permission)==
-      PackageManager.PERMISSION_DENIED){
-      ActivityCompat.requestPermissions(this,arrayOf(permission),requestCode)
-    }else{
-      val snackbar = Snackbar.make(binding.root, "Mensaje de ejemplo", Snackbar.LENGTH_LONG)
-
-      snackbar.setAction("Cerrar") {
-        snackbar.dismiss()
-      }
-      snackbar.show()
-    }
-  }
-
-
 
   private fun requestCameraPermission(){
     if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA)){
@@ -97,6 +91,25 @@ companion object{
       ActivityCompat.requestPermissions(this,arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION)
     }
   }
+  private fun requestStoragePermission(){
+    if(ActivityCompat.shouldShowRequestPermissionRationale(this,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+      AlertDialog.Builder(this)
+        .setTitle("Permiso denegado")
+        .setMessage("Este permiso es necesario para el funcionamiento de la aplicación")
+        .setPositiveButton("Ok", DialogInterface.OnClickListener { dialogInterface, i ->
+          ActivityCompat.requestPermissions(this,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+              Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION)
+        }).setNegativeButton("Cancelar", DialogInterface.OnClickListener { dialogInterface, i ->
+
+        }).create().show()
+    }else{
+      ActivityCompat.requestPermissions(this,
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+          Manifest.permission.WRITE_EXTERNAL_STORAGE), STORAGE_PERMISSION)
+    }
+  }
   override fun onRequestPermissionsResult(
     requestCode: Int,
     permissions: Array<out String>,
@@ -105,15 +118,24 @@ companion object{
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     if(requestCode == CAMERA_PERMISSION){
       if(grantResults.isNotEmpty() && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-        Log.i("Camera permission","Permiso aceptado")
+        Log.i("Camera permission","Permiso de cámara aceptado")
       }else{
-        Log.i("Camera permission","Permiso no aceptado")
+        val snackbar = Snackbar.make(binding.root, "Permiso de camara no fue otorgado", Snackbar.LENGTH_LONG)
+        snackbar.setAction("Cerrar") {
+        }
+        snackbar.show()
+        Log.i("Camera permission","Permiso de cámara no aceptado")
       }
     }else if(requestCode== STORAGE_PERMISSION){
-      if(grantResults.isNotEmpty() && grantResults[1]== PackageManager.PERMISSION_GRANTED){
-        Toast.makeText(this,"ALMACENAMIENTO XD",Toast.LENGTH_LONG).show()
+      if(grantResults.isNotEmpty() && grantResults[0]== PackageManager.PERMISSION_GRANTED &&
+        grantResults[1]== PackageManager.PERMISSION_GRANTED){
+        Log.i("Storage permission","Permiso de almacenamiento aceptados")
       }else{
-        Toast.makeText(this,"NO ALMACENAMIENTO XD",Toast.LENGTH_LONG).show()
+        val snackbar = Snackbar.make(binding.root, "Permiso de almacenamiento no fue otorgado", Snackbar.LENGTH_LONG)
+        snackbar.setAction("Cerrar") {
+        }
+        snackbar.show()
+        Log.i("Storage permission","Permiso de almacenamiento no aceptados")
       }
 
     }
