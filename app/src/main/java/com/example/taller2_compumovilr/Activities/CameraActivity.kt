@@ -35,7 +35,17 @@ class CameraActivity : AppCompatActivity() {
 companion object{
   private const val CAMERA_PERMISSION=100
   private const val STORAGE_PERMISSION=101
+
+  private const val CAMERA_REQUEST=1
+  private const val VIDEO_REQUEST=2
+
+  private const val GALLERY_PHOTO_REQUEST=3
+  private const val GALLERY_VIDEO_REQUEST=4
 }
+
+
+
+
   private lateinit var binding: ActivityCameraBinding
 
 
@@ -51,7 +61,7 @@ companion object{
       if(ContextCompat.checkSelfPermission(this,
           Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED){
         Log.i("Permission camera:","asasdasd aceptados")
-        takePictureOrVideo()
+        takePhotoOrVideo()
       }else{
         requestCameraPermission()
       }
@@ -61,8 +71,8 @@ companion object{
           Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
         ContextCompat.checkSelfPermission(this,
           Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        Log.i("Permission storage:","Permisos aceptados")
-
+        Log.i("Permission storage:","asdasdasdasd aceptados")
+        galleryPhotoOrVideo()
       } else {
         requestStoragePermission()
       }
@@ -70,7 +80,7 @@ companion object{
     }
   }
 
-  private fun takePictureOrVideo() {
+  private fun takePhotoOrVideo() {
     if (binding.videoToggle.isChecked) {
       takeVideo()
     } else {
@@ -93,7 +103,7 @@ companion object{
     )
     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pictureImagePath)
     try {
-      startActivityForResult(takePictureIntent, 1)
+      startActivityForResult(takePictureIntent, CAMERA_REQUEST)
     } catch (e: ActivityNotFoundException) {
       Log.e(TAG, e.localizedMessage)
     }
@@ -106,7 +116,7 @@ companion object{
     takeVideoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
     if (takeVideoIntent.resolveActivity(this.packageManager) != null) {
       try {
-        startActivityForResult(takeVideoIntent, 2)
+        startActivityForResult(takeVideoIntent, VIDEO_REQUEST)
       } catch (e: ActivityNotFoundException) {
         Log.e(TAG, e.localizedMessage)
       }
@@ -114,7 +124,95 @@ companion object{
       Toast.makeText(this,"ESKERE",Toast.LENGTH_SHORT)
     }
   }
+  private fun galleryPhotoOrVideo(){
+    if (binding.videoToggle.isChecked) {
+      galleryVideo()
+    } else {
+      galleryPhoto()
+    }
+  }
+  private fun galleryPhoto(){
+    val i = Intent(
+      Intent.ACTION_PICK,
+      MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    )
+    startActivityForResult(i, GALLERY_PHOTO_REQUEST)
+  }
+  private fun galleryVideo(){
+    val i = Intent(
+      Intent.ACTION_PICK,
+      MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    )
+    startActivityForResult(i, GALLERY_VIDEO_REQUEST)
+  }
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    if(resultCode == RESULT_CANCELED){
+      binding.imagePresentation.visibility = View.GONE
+      binding.videoPresentation.visibility = View.GONE
+    }else{
+      when(requestCode) {
+        CAMERA_REQUEST -> {
+          if(resultCode == RESULT_OK) {
+            binding.imagePresentation.visibility = View.VISIBLE
+            binding.videoPresentation.visibility = View.GONE
 
+            binding.imagePresentation.setImageDrawable(null);
+            binding.imagePresentation.setImageURI(pictureImagePath)
+            binding.imagePresentation.scaleType = ImageView.ScaleType.FIT_CENTER
+            binding.imagePresentation.adjustViewBounds = true
+
+          }
+        }
+        VIDEO_REQUEST -> {
+          if(resultCode == RESULT_OK) {
+            binding.imagePresentation.visibility = View.GONE
+            binding.videoPresentation.visibility = View.VISIBLE
+
+            binding.videoPresentation.setVideoURI(null)
+            binding.videoPresentation.setVideoURI(data?.data)
+            binding.videoPresentation.setMediaController(MediaController(this))
+            binding.videoPresentation.start()
+          }
+        }
+        GALLERY_PHOTO_REQUEST -> {
+          val selectedImage: Uri? = data?.data
+          val imageType = contentResolver.getType(selectedImage!!)
+          if (imageType?.startsWith("image/") == true) {
+            binding.imagePresentation.visibility = View.VISIBLE
+            binding.videoPresentation.visibility = View.GONE
+            // Es una foto
+            binding.imagePresentation.setImageURI(selectedImage)
+          } else {
+            //No es una foto
+            binding.videoPresentation.visibility = View.GONE
+            Toast.makeText(this,"Para seleccionar un video y presentarlo, activa el toggle.",Toast.LENGTH_SHORT).show()
+          }
+        }
+        GALLERY_VIDEO_REQUEST->{
+          val selectedVideo: Uri? = data?.data
+          val videoType = contentResolver.getType(selectedVideo!!)
+          if (videoType?.startsWith("video/") == true) {
+            binding.imagePresentation.visibility = View.GONE
+            binding.videoPresentation.visibility = View.VISIBLE
+            // Es un video
+            binding.videoPresentation.setVideoURI(null)
+            binding.videoPresentation.setVideoURI(selectedVideo)
+            binding.videoPresentation.setMediaController(MediaController(this))
+            binding.videoPresentation.start()
+          } else {
+            //No es un video
+            binding.videoPresentation.visibility = View.GONE
+            Toast.makeText(this,"Para seleccionar una foto y presentarla, desactiva el toggle.",Toast.LENGTH_SHORT).show()
+          }
+        }
+      }
+    }
+
+    }
+
+
+  //PERMISOS
   private fun requestCameraPermission(){
     if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA)){
      AlertDialog.Builder(this)
@@ -158,7 +256,7 @@ companion object{
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     if(requestCode == CAMERA_PERMISSION){
       if(grantResults.isNotEmpty() && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-        takePictureOrVideo()
+        takePhotoOrVideo()
         Log.i("Camera permission","Permiso de cámara aceptado")
       }else{
         val snackbar = Snackbar.make(binding.root, "Permiso de camara no fue otorgado", Snackbar.LENGTH_LONG)
@@ -171,6 +269,7 @@ companion object{
       if(grantResults.isNotEmpty() && grantResults[0]== PackageManager.PERMISSION_GRANTED &&
         grantResults[1]== PackageManager.PERMISSION_GRANTED){
         Log.i("Storage permission","Permiso de almacenamiento aceptados")
+        galleryPhotoOrVideo()
       }else{
         val snackbar = Snackbar.make(binding.root, "Permiso de almacenamiento no fue otorgado", Snackbar.LENGTH_LONG)
         snackbar.setAction("Cerrar") {
@@ -179,34 +278,6 @@ companion object{
         Log.i("Storage permission","Permiso de almacenamiento no aceptados")
       }
 
-    }
-  }
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == 1 && resultCode == RESULT_OK) {
-      binding.imagePresentation.visibility = View.VISIBLE
-      binding.videoPresentation.visibility = View.GONE
-
-      binding.imagePresentation.setImageDrawable(null);
-      binding.imagePresentation.setImageURI(pictureImagePath)
-      binding.imagePresentation.scaleType = ImageView.ScaleType.FIT_CENTER
-      binding.imagePresentation.adjustViewBounds = true
-    }else if (requestCode == 2 && resultCode == RESULT_OK) {
-      binding.imagePresentation.visibility = View.GONE
-      binding.videoPresentation.visibility = View.VISIBLE
-
-      binding.videoPresentation.setVideoURI(null)
-      binding.videoPresentation.setVideoURI(data?.data)
-      binding.videoPresentation.setMediaController(MediaController(this))
-      binding.videoPresentation.start()
-    }
-    if (requestCode == 2 && resultCode == RESULT_CANCELED){
-      binding.videoPresentation.visibility = View.GONE
-      binding.imagePresentation.visibility = View.GONE
-    }
-    if (requestCode == 1 && resultCode == RESULT_CANCELED){
-      binding.imagePresentation.visibility = View.GONE
-      binding.videoPresentation.visibility = View.GONE
     }
   }
 }
