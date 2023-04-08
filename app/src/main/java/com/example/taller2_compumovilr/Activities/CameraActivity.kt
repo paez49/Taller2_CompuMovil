@@ -46,10 +46,12 @@ companion object{
     val view = binding.root
     setContentView(view)
     binding.videoPresentation.visibility = View.GONE
+
     binding?.takeButton?.setOnClickListener {
       if(ContextCompat.checkSelfPermission(this,
-          Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
-        Log.i("Permission camera:","Permisos aceptados")
+          Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED){
+        Log.i("Permission camera:","asasdasd aceptados")
+        takePictureOrVideo()
       }else{
         requestCameraPermission()
       }
@@ -62,7 +64,7 @@ companion object{
         Log.i("Permission storage:","Permisos aceptados")
 
       } else {
-        //requestStoragePermission()
+        requestStoragePermission()
       }
 
     }
@@ -200,9 +202,11 @@ companion object{
     }
     if (requestCode == 2 && resultCode == RESULT_CANCELED){
       binding.videoPresentation.visibility = View.GONE
+      binding.imagePresentation.visibility = View.GONE
     }
     if (requestCode == 1 && resultCode == RESULT_CANCELED){
       binding.imagePresentation.visibility = View.GONE
+      binding.videoPresentation.visibility = View.GONE
     }
   }
 }
