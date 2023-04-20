@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.taller2_compumovilr.Activities.CameraActivity
+import com.example.taller2_compumovilr.Activities.mapsActivity
 import com.example.taller2_compumovilr.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +20,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         binding?.mapButton?.setOnClickListener {
-            val intent = Intent(this, CameraActivity::class.java)
+            val intent = Intent(this, mapsActivity::class.java)
             startActivity(intent)
         }
     }
