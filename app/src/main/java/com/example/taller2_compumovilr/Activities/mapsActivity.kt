@@ -101,6 +101,7 @@ class mapsActivity : AppCompatActivity(), OnMapReadyCallback,OnMyLocationButtonC
             }
             override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {}
         }, lightSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        map.uiSettings.isMapToolbarEnabled =false
     }
     private fun buscarLugar(query: String) {
 
@@ -193,12 +194,16 @@ class mapsActivity : AppCompatActivity(), OnMapReadyCallback,OnMyLocationButtonC
             button.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.blue)));
             button.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_play))
             state = (1)
+            Toast.makeText(this,"Finalizando seguimiento", Toast.LENGTH_SHORT).show()
+
         }
         else
         {
             button.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.red)));
             button.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_pause))
             state = 2
+            Toast.makeText(this,"Iniciando seguimiento", Toast.LENGTH_SHORT).show()
+
         }
     }
 
